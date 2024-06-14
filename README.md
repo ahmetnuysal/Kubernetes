@@ -60,7 +60,7 @@ olur.
 
 ## Docker Swarm ve Kubernetes Arasındaki Farklar
 
-![](#https://miro.medium.com/v2/resize:fit:828/format:webp/0*UeutLfH3GOF9-Hwz)
+![image](https://github.com/ahmetnuysal/Kubernetes/assets/85068070/bb9a154f-285e-4e92-8bd0-da0e46a8efb5)
 
 ## Kubernetes Mimarisi - Ana Düğüm
 
