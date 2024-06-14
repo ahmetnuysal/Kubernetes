@@ -3,6 +3,7 @@
 - [Kubernetes Giriş](#Kubernetese-Giriş)
 - [Monolitik Mimari ve MicroService](#Monolitic-Mimari-ve-MicroService)
 - [Docker Swarm ve Kubernetes Arasındaki Farklar](#Docker-Swarm-ve-Kubernetes-Arasındaki-Farklar)
+- [Kubernetes Mimarisi](#Kubernetes-Mimarisi)
 
 ## Kubernetes Giriş
 
@@ -62,7 +63,7 @@ olur.
 
 ![image](https://github.com/ahmetnuysal/Kubernetes/assets/85068070/bb9a154f-285e-4e92-8bd0-da0e46a8efb5)
 
-## Kubernetes Mimarisi - Ana Düğüm
+## Kubernetes Mimarisi
 
 Kubernetes, bir 'Kubernetes Kümesi' oluşturan Master Node ve Worker node'un bulunduğu istemci-sunucu mimarisini takip eder. İhtiyaca göre birden fazla işçi düğümüne ve Ana düğüme sahip olabiliriz.
 
