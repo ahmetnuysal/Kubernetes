@@ -62,10 +62,60 @@ olur.
 
 ![](#https://miro.medium.com/v2/resize:fit:828/format:webp/0*UeutLfH3GOF9-Hwz)
 
+## Kubernetes Mimarisi - Ana Düğüm
+
+Kubernetes, bir 'Kubernetes Kümesi' oluşturan Master Node ve Worker node'un bulunduğu istemci-sunucu mimarisini takip eder. İhtiyaca göre birden fazla işçi düğümüne ve Ana düğüme sahip olabiliriz.
+
+Kontrol Düzlemi: API sunucusu, etcd, zamanlayıcı ve denetleyici yöneticisi dahil olmak üzere kontrol düzlemi bileşenleri genellikle bir Kubernetes kümesinin ana düğüm(ler)inde bulunur. Bu bileşenler kümeyi bir bütün olarak yönetmek ve kontrol etmekten sorumludur.
+
+> Master Node
+
+Master Node, daha önce tartıştığımız her şeyi yönetmeye yardımcı olan dört ana bileşene sahiptir:
+
+1. API Sunucusu: Basit bir ifadeyle, kubectl'i ana düğüme yükledikten sonra geliştiriciler pod oluşturmak için komutları çalıştırır. Böylece komut API Sunucusuna gider ve API Sunucusu da bunu podların oluşturulmasına yardımcı olacak bileşene iletir. Başka bir deyişle, API Sunucusu, API Sunucusunun işleri uygulamak için hiyerarşik yaklaşımı izlediği herhangi bir Kubernetes görevi için bir giriş noktasıdır.
+
+2. Etcd: Etcd, Ana düğümün ve İşçi düğümünün (tüm küme) Pod IP'leri, Düğümler, ağ yapılandırmaları vb. gibi tüm bilgilerini depolayan bir veritabanı gibidir. Etcd verileri anahtar-değer çiftinde depolar. Veriler vb. içinde depolanmak üzere API Sunucusundan gelir.
+
+3. Denetleyici Yöneticisi: Denetleyici Yöneticisi, Kubernetes kümesinin API Sunucusundan kümenin istenen durumu gibi verileri/bilgileri toplar ve ardından API Sunucusuna talimatlar göndererek ne yapılacağına karar verir.
+
+4. Zamanlayıcı: API Sunucusu Denetleyici Yöneticisinden bilgileri topladıktan sonra, API Sunucusu pod sayısının artırılması vb. gibi ilgili görevi gerçekleştirmesi için Zamanlayıcıya bildirimde bulunur. Bildirim aldıktan sonra, Zamanlayıcı sağlanan iş üzerinde harekete geçer. Dört bileşeni de gerçek zamanlı bir örnekle anlayalım.
+
+> Worker Node
+
+Worker Node (İşçi Düğümü), konteynerleri yöneten ve onlarla ilgilenen ve kaynakları planlanan konteynerlere atamak için talimatlar veren Ana Düğüm ile iletişim kuran aracıdır. Bir Kubernetes kümesi, kaynakları gerektiği gibi ölçeklendirmek için birden fazla işçi düğümüne sahip olabilir. Worker Node, konteynerleri yönetmeye ve Master Node ile iletişim kurmaya yardımcı olan dört bileşen içerir:
+
+1. Kubelet: kubelet, Pod'ları yöneten ve pod'un çalışıp çalışmadığını düzenli olarak kontrol eden Worker Node'un birincil bileşenidir. Podlar düzgün çalışmıyorsa, kubelet yeni bir pod oluşturur ve bir öncekiyle değiştirir çünkü başarısız olan pod yeniden başlatılamaz, bu nedenle podun IP'si değişebilir. Ayrıca, kubelet podlarla ilgili ayrıntıları Ana Düğümde bulunan API Sunucusundan alır.
+2. Kube-proxy: kube-proxy, pod IP'si vb. gibi tüm kümenin tüm ağ yapılandırmasını içerir. Kube-proxy, ağ yapılandırması altında gelen yük dengeleme ve yönlendirme ile ilgilenir. Kube-proxy podlar hakkındaki bilgileri Master Node üzerinde bulunan API Server'dan alır.
+3. Podlar: Pod, uygulamanın konuşlandırıldığı bir konteyner veya birden fazla konteyner içeren çok küçük bir birimdir. Pod, konteynerlere uygun IP'yi dağıtan bir Genel veya Özel IP aralığına sahiptir. Her podun altında bir konteyner olması iyidir.
+4. Konteyner Motoru: Konteynere çalışma zamanı ortamını sağlamak için Konteyner Motoru kullanılır. Kubernetes'te Konteyner motoru, konteynerleri oluşturmaktan ve yönetmekten sorumlu olan konteyner çalışma zamanı ile doğrudan etkileşime girer. Piyasada CRI-O, containerd, rkt(rocket), vb. gibi birçok Konteyner motoru bulunmaktadır. Ancak Docker en çok kullanılan ve güvenilen Konteyner Motorlarından biridir. Bu nedenle, önümüzdeki gün Kubernetes kümesini kurarken bunu kullanacağız.
 
 
+#### Ana Düğüm - Alışveriş Merkezi Yönetimi:
+● Bir alışveriş merkezinde, her şeyle ilgilenen bir yönetim ofisiniz vardır. Kubernetes'te bu Master Node'dur.
+● Ana Düğüm, tıpkı alışveriş merkezi yönetiminin alışveriş merkezinin sorunsuz çalışmasını sağlaması gibi, kümedeki tüm faaliyetleri yönetir ve koordine eder.
 
+#### kube-apiserver - Merkezi Kontrol Masası:
+● Kube-apiserver'ı alışveriş merkezinin merkezi kontrol masası olarak düşünün. Tüm taleplerin (mağaza açılışları veya müşteri soruları gibi) yönlendirildiği yerdir.
+● Alışveriş merkezi yönetiminin mağazalarla iletişim kurması gibi, kube-apiserver da tüm Kubernetes bileşenleriyle iletişim kurar.
 
+#### etcd - Ana Kayıtlar:
+● etcd, mağaza konumları ve saatleri gibi önemli bilgileri içeren alışveriş merkezinin ana kayıtlarıyla karşılaştırılabilir.
+● Yapılandırma ve küme durumu verilerini depolayan bir anahtar-değer deposudur. kube-controller-manager - Görev Yöneticileri:
+● Güvenlik ve bakım gibi farklı alışveriş merkezi departmanları için özel görev yöneticilerine sahip olduğunuzu düşünün.
+● Kubernetes'te kube-controller-manager, istenen sayıda Pod'un çalışmasını sağlamak gibi çeşitli görevleri yerine getirir.
 
+#### kube-scheduler - Zamanlayıcı Yöneticisi:
+● Kube zamanlayıcısını, hangi çalışanların (Pod'ların) nerede (hangi Worker Node üzerinde) çalışması gerektiğine karar veren bir yönetici olarak düşünün.
+● Eşit dağılım ve verimli kaynak tahsisi sağlar.
 
+#### Kubelet - Mağaza Yöneticileri:
+● Her mağazada (Worker Node), çalışanların (Pod'lar) doğru çalışmasını sağlayan bir mağaza yöneticiniz (Kubelet) vardır.
+● Kubelet, Master Node ile iletişim kurar ve deposundaki Pod'ları yönetir.
 
+#### kube-proxy - Müşteri Hizmetleri Masası:
+● kube-proxy her mağazada bir müşteri hizmetleri masası gibi davranır. Müşteri sorularını (ağ talepleri) ele alır ve bunları doğru çalışana (Pod) yönlendirir.
+● Yük dengeleme ve yönlendirme için ağ kurallarını korur.
+
+#### Konteyner Çalışma Zamanı - Çalışan Eğitimi:
+● Her mağazada, görevlerini yerine getirmek için eğitime ihtiyaç duyan çalışanlarınız (Pod'lar) var.
+● Konteyner çalışma zamanı (Docker gibi), çalışanların (Pod'lar) görevlerini yerine getirmeleri için gerekli eğitimi (çalışma zamanı ortamı) sağlar.
